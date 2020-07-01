@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "id": "totemfill",
+  "version": "${version}",
+
+  "name": "Totem Fill",
+  "description": "Automatically refills totems of undying.",
+  "authors": [
+    "James Conway"
+  ],
+
+  "license": "CC0-1.0",
+  "icon": "assets/totemfill/icon.png",
+
+  "environment": "client",
+
+  "entrypoints": {
+    "main": [
+      "uk.tethys.totemfill.TotemFill"
+    ],
+    "modmenu": [
+      "uk.tethys.totemfill.integration.TotemFillModMenuImpl"
+    ]
+  },
+  "mixins": [
+    "totemfill.mixins.json"
+  ],
+
+  "custom": {
+    "modmenu:clientsideOnly": true
+  },
+
+  "depends": {
+    "fabricloader": ">=0.7.4",
+    "fabric": "*",
+    "minecraft": "1.16.x"
+  },
+
+  "suggests": {}
+
+}

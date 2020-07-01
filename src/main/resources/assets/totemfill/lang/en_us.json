@@ -1,0 +1,13 @@
+{
+  "title.totemfill.config": "Totem Fill Configuration",
+  "category.totemfill.general": "General",
+  "category.totemfill.messages": "Messages",
+  "text.totemfill.nooptions": "There are not yet any options in this category",
+  "option.totemfill.nomoretotems": "No More Totems Message",
+  "option.totemfill.totemused": "Totem Used Message",
+  "option.totemfill.totemcount": "Totem Count Message",
+  "option.totemfill.totemarmed": "Totem Armed Message",
+  "option.totemfill.minhealth": "Health To Arm",
+  "tooltip.totemfill.minhealth": "Set to 0 to prevent totem arming",
+  "tooltip.totemfill.totemcount": "Use % to represent to the number of totems remaining"
+}
