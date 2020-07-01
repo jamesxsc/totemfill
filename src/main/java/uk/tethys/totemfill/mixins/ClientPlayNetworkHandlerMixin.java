@@ -16,6 +16,7 @@ import net.minecraft.network.packet.s2c.play.EntityStatusS2CPacket;
 import net.minecraft.network.packet.s2c.play.HealthUpdateS2CPacket;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Style;
+import net.minecraft.text.Text;
 import net.minecraft.text.TextColor;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -86,14 +87,16 @@ public class ClientPlayNetworkHandlerMixin {
                 }
             }
             if (slot < 0) {
-                entity.sendMessage(new LiteralText(TotemFillModMenuImpl.getConfig().getNomoretotems())
-                        .setStyle(Style.EMPTY.withColor(TextColor.fromRgb(15406100))), false);
+                Text msg = new LiteralText(TotemFillModMenuImpl.getConfig().getNomoretotems())
+                        .setStyle(Style.EMPTY.withColor(TextColor.fromRgb(15406100)));
+                System.out.println(MinecraftClient.getInstance().inGameHud.getChatHud().getMessageHistory().get(0));
+                if (!MinecraftClient.getInstance().inGameHud.getChatHud().getMessageHistory().get(0).equals(msg.asString()))
+                    entity.sendMessage(msg, false);
             } else {
                 ClientSidePacketRegistry.INSTANCE.sendToServer(new PickFromInventoryC2SPacket(slot));
                 ClientSidePacketRegistry.INSTANCE.sendToServer(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.SWAP_ITEM_WITH_OFFHAND,
                         entity.getBlockPos(), entity.getHorizontalFacing()));
                 ClientSidePacketRegistry.INSTANCE.sendToServer(new PickFromInventoryC2SPacket(slot));
-
 
 
                 entity.sendMessage(new LiteralText(TotemFillModMenuImpl.getConfig().getTotemarmed())
