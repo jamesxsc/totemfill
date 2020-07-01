@@ -94,6 +94,8 @@ public class ClientPlayNetworkHandlerMixin {
                         entity.getBlockPos(), entity.getHorizontalFacing()));
                 ClientSidePacketRegistry.INSTANCE.sendToServer(new PickFromInventoryC2SPacket(slot));
 
+
+
                 entity.sendMessage(new LiteralText(TotemFillModMenuImpl.getConfig().getTotemarmed())
                         .setStyle(Style.EMPTY.withColor(TextColor.fromRgb(16110658))), false);
                 entity.sendMessage(new LiteralText(TotemFillModMenuImpl.getConfig().getTotemcount()
