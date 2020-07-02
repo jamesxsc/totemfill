@@ -23,6 +23,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import uk.tethys.totemfill.TotemFill;
 import uk.tethys.totemfill.integration.TotemFillModMenuImpl;
 
 @Environment(EnvType.CLIENT)
@@ -32,7 +33,6 @@ public class ClientPlayNetworkHandlerMixin {
     @Shadow
     private ClientWorld world;
 
-    @SuppressWarnings("ConstantConditions")
     @Inject(method = "onEntityStatus", at = @At("RETURN"))
     public void onEntityStatus(EntityStatusS2CPacket entityStatusS2CPacket, CallbackInfo callbackInfo) {
         // Check the packet is for totems
@@ -40,6 +40,8 @@ public class ClientPlayNetworkHandlerMixin {
             Entity entity = entityStatusS2CPacket.getEntity(world);
             // Mod should only work for players
             if (entity instanceof PlayerEntity) {
+                if (TotemFill.ticks >= 0)
+                    return;
                 int slot = -1;
                 int totemCount = 0;
                 for (int i = 0; i < ((PlayerEntity) entity).inventory.size() - 1; i++) {
@@ -54,10 +56,7 @@ public class ClientPlayNetworkHandlerMixin {
                     ((PlayerEntity) entity).sendMessage(new LiteralText(TotemFillModMenuImpl.getConfig().getNomoretotems())
                             .setStyle(Style.EMPTY.withColor(TextColor.fromRgb(15406100))), false);
                 } else {
-                    ClientSidePacketRegistry.INSTANCE.sendToServer(new PickFromInventoryC2SPacket(slot));
-                    ClientSidePacketRegistry.INSTANCE.sendToServer(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.SWAP_ITEM_WITH_OFFHAND,
-                            entity.getBlockPos(), entity.getHorizontalFacing()));
-                    ClientSidePacketRegistry.INSTANCE.sendToServer(new PickFromInventoryC2SPacket(slot));
+                    TotemFill.queuePackets(slot, (PlayerEntity) entity);
 
                     ((PlayerEntity) entity).sendMessage(new LiteralText(TotemFillModMenuImpl.getConfig().getTotemused())
                             .setStyle(Style.EMPTY.withColor(TextColor.fromRgb(16110658))), false);
@@ -77,6 +76,8 @@ public class ClientPlayNetworkHandlerMixin {
             if (entity.inventory.getStack(entity.inventory.selectedSlot).getItem() == Items.TOTEM_OF_UNDYING ||
                     entity.inventory.offHand.get(0).getItem() == Items.TOTEM_OF_UNDYING)
                 return;
+            if (TotemFill.ticks >= 0)
+                return;
             int slot = -1;
             int totemCount = 0;
             for (int i = 0; i < entity.inventory.size() - 1; i++) {
@@ -89,15 +90,10 @@ public class ClientPlayNetworkHandlerMixin {
             if (slot < 0) {
                 Text msg = new LiteralText(TotemFillModMenuImpl.getConfig().getNomoretotems())
                         .setStyle(Style.EMPTY.withColor(TextColor.fromRgb(15406100)));
-                System.out.println(MinecraftClient.getInstance().inGameHud.getChatHud().getMessageHistory().get(0));
                 if (!MinecraftClient.getInstance().inGameHud.getChatHud().getMessageHistory().get(0).equals(msg.asString()))
                     entity.sendMessage(msg, false);
             } else {
-                ClientSidePacketRegistry.INSTANCE.sendToServer(new PickFromInventoryC2SPacket(slot));
-                ClientSidePacketRegistry.INSTANCE.sendToServer(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.SWAP_ITEM_WITH_OFFHAND,
-                        entity.getBlockPos(), entity.getHorizontalFacing()));
-                ClientSidePacketRegistry.INSTANCE.sendToServer(new PickFromInventoryC2SPacket(slot));
-
+                TotemFill.queuePackets(slot, entity);
 
                 entity.sendMessage(new LiteralText(TotemFillModMenuImpl.getConfig().getTotemarmed())
                         .setStyle(Style.EMPTY.withColor(TextColor.fromRgb(16110658))), false);

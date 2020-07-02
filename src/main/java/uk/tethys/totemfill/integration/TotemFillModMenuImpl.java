@@ -34,6 +34,7 @@ public class TotemFillModMenuImpl implements ModMenuApi {
         config = loadConfig();
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public String getModId() {
         return TotemFill.MOD_ID;
@@ -59,7 +60,7 @@ public class TotemFillModMenuImpl implements ModMenuApi {
 
             ConfigCategory general = builder.getOrCreateCategory(new TranslatableText("category.totemfill.general"));
 
-            general.addEntry(entryBuilder.startIntSlider(new TranslatableText("option.totemfill.minhealth"), 4, 0, 20)
+            general.addEntry(entryBuilder.startIntSlider(new TranslatableText("option.totemfill.minhealth"), config.getMinhealth(), 0, 20)
                     .setTooltip(new TranslatableText("tooltip.totemfill.minhealth"))
                     .setDefaultValue(4)
                     .setSaveConsumer(config::setMinhealth)
