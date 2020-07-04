@@ -11,6 +11,7 @@ import me.shedaniel.clothconfig2.api.ConfigEntryBuilder;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.client.util.InputUtil;
 import net.minecraft.text.TranslatableText;
 import uk.tethys.totemfill.TotemFill;
 
@@ -66,6 +67,18 @@ public class TotemFillModMenuImpl implements ModMenuApi {
                     .setSaveConsumer(config::setMinhealth)
                     .build());
 
+            general.addEntry(entryBuilder.startIntSlider(new TranslatableText("option.totemfill.lowerdelaybound"), config.getLowerdelaybound(), 0, config.getUpperdelaybound())
+                    .setTooltip(new TranslatableText("tooltip.totemfill.lowerdelaybound"))
+                    .setDefaultValue(Math.min(6, config.getUpperdelaybound()))
+                    .setSaveConsumer(config::setLowerdelaybound)
+                    .build());
+
+            general.addEntry(entryBuilder.startIntSlider(new TranslatableText("option.totemfill.upperdelaybound"), config.getUpperdelaybound(), config.getLowerdelaybound(), 25)
+                    .setTooltip(new TranslatableText("tooltip.totemfill.upperdelaybound"))
+                    .setDefaultValue(Math.max(12, config.getLowerdelaybound()))
+                    .setSaveConsumer(config::setUpperdelaybound)
+                    .build());
+
             ConfigCategory messages = builder.getOrCreateCategory(new TranslatableText("category.totemfill.messages"));
 
             messages.addEntry(entryBuilder.startStrField(new TranslatableText("option.totemfill.nomoretotems"), config.getNomoretotems())
@@ -107,7 +120,7 @@ public class TotemFillModMenuImpl implements ModMenuApi {
                     "You have run out of totems!",
                     "You used a totem!",
                     "You have % totems remaining.",
-                    "Low health; totem armed.", 4);
+                    "Low health; totem armed.", 4, 6, 12);
         }
     }
 
@@ -153,18 +166,38 @@ public class TotemFillModMenuImpl implements ModMenuApi {
             this.totemarmed = totemarmed;
         }
 
+        public int getLowerdelaybound() {
+            return lowerdelaybound;
+        }
+
+        public void setLowerdelaybound(int lowerdelaybound) {
+            this.lowerdelaybound = lowerdelaybound;
+        }
+
+        public int getUpperdelaybound() {
+            return upperdelaybound;
+        }
+
+        public void setUpperdelaybound(int upperdelaybound) {
+            this.upperdelaybound = upperdelaybound;
+        }
+
         private String nomoretotems;
         private String totemused;
         private String totemcount;
         private String totemarmed;
         private int minhealth;
+        private int lowerdelaybound;
+        private int upperdelaybound;
 
-        public TotemFillConfig(String nomoretotems, String totemused, String totemcount, String totemarmed, int minhealth) {
+        public TotemFillConfig(String nomoretotems, String totemused, String totemcount, String totemarmed, int minhealth, int lowerdelaybound, int upperdelaybound) {
             this.nomoretotems = nomoretotems;
             this.totemused = totemused;
             this.totemcount = totemcount;
             this.totemarmed = totemarmed;
             this.minhealth = minhealth;
+            this.lowerdelaybound = lowerdelaybound;
+            this.upperdelaybound = upperdelaybound;
         }
 
     }

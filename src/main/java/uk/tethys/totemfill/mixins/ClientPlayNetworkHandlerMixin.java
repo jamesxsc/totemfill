@@ -2,7 +2,6 @@ package uk.tethys.totemfill.mixins;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.fabricmc.fabric.api.network.ClientSidePacketRegistry;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.network.ClientPlayerEntity;
@@ -10,8 +9,6 @@ import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Items;
-import net.minecraft.network.packet.c2s.play.PickFromInventoryC2SPacket;
-import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
 import net.minecraft.network.packet.s2c.play.EntityStatusS2CPacket;
 import net.minecraft.network.packet.s2c.play.HealthUpdateS2CPacket;
 import net.minecraft.text.LiteralText;
@@ -28,13 +25,18 @@ import uk.tethys.totemfill.integration.TotemFillModMenuImpl;
 
 @Environment(EnvType.CLIENT)
 @Mixin(value = ClientPlayNetworkHandler.class)
-public class ClientPlayNetworkHandlerMixin {
+public abstract class ClientPlayNetworkHandlerMixin {
 
     @Shadow
     private ClientWorld world;
 
+    private double oldHealth = 20.0;
+
     @Inject(method = "onEntityStatus", at = @At("RETURN"))
     public void onEntityStatus(EntityStatusS2CPacket entityStatusS2CPacket, CallbackInfo callbackInfo) {
+        if (!TotemFill.enabled)
+            return;
+
         // Check the packet is for totems
         if (entityStatusS2CPacket.getStatus() == 35) {
             Entity entity = entityStatusS2CPacket.getEntity(world);
@@ -71,7 +73,11 @@ public class ClientPlayNetworkHandlerMixin {
     @SuppressWarnings("ConstantConditions")
     @Inject(method = "onHealthUpdate", at = @At("RETURN"))
     public void onHealthUpdate(HealthUpdateS2CPacket healthUpdateS2CPacket, CallbackInfo callbackInfo) {
-        if (healthUpdateS2CPacket.getHealth() < TotemFillModMenuImpl.getConfig().getMinhealth()) {
+        if (!TotemFill.enabled)
+            return;
+
+        if (healthUpdateS2CPacket.getHealth() < TotemFillModMenuImpl.getConfig().getMinhealth() &&
+                healthUpdateS2CPacket.getHealth() < oldHealth) {
             ClientPlayerEntity entity = MinecraftClient.getInstance().player;
             if (entity.inventory.getStack(entity.inventory.selectedSlot).getItem() == Items.TOTEM_OF_UNDYING ||
                     entity.inventory.offHand.get(0).getItem() == Items.TOTEM_OF_UNDYING)
@@ -102,6 +108,7 @@ public class ClientPlayNetworkHandlerMixin {
                         .setStyle(Style.EMPTY.withColor(TextColor.fromRgb(16110658))), false);
             }
         }
+        this.oldHealth = healthUpdateS2CPacket.getHealth();
     }
 
 }

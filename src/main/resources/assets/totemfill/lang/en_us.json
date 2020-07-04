@@ -9,5 +9,7 @@
   "option.totemfill.totemarmed": "Totem Armed Message",
   "option.totemfill.minhealth": "Health To Arm",
   "tooltip.totemfill.minhealth": "Set to 0 to prevent totem arming",
-  "tooltip.totemfill.totemcount": "Use % to represent to the number of totems remaining"
+  "tooltip.totemfill.totemcount": "Use % to represent to the number of totems remaining",
+  "category.totemfill.controls": "Totem Fill",
+  "key.totemfill.toggle": "Toggle"
 }
